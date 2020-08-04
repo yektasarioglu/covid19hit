@@ -1,0 +1,11 @@
+<resources>
+
+    <style name="light_page_background">
+        <item name="android:background">#ffffff</item>
+    </style>
+
+    <style name="dark_page_background">
+        <item name="android:background">#000000</item>
+    </style>
+
+</resources>

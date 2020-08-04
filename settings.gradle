@@ -1,0 +1,3 @@
+include ':network'
+include ':app', ':base'
+rootProject.name = "COVID19 Health Institution Tracker"

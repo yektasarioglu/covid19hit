@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/rounded_rect"
+    android:layout_width="match_parent"
+    android:layout_height="150dp"
+
+    android:orientation="vertical"
+    tools:background="@color/cardview_dark_background">
+
+    <TextView
+        android:id="@+id/directionTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="?colorAccent"
+        android:padding="10dp"
+        tools:text="Slight right onto Arpa Emini Köprüsü Sokak" />
+
+    <TextView
+        android:id="@+id/directionDetailTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:textColor="?colorAccent"
+        android:padding="10dp"
+        tools:text="66m (1 min)" />
+
+
+</LinearLayout>

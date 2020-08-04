@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/theme"
+        android:icon="@drawable/dark_36"
+        app:showAsAction="ifRoom"
+        android:title="Compose">
+    </item>
+    
+</menu>

@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">COVID-19 Health Institution Tracker</string>
+    <string name="abbreviated_app_name">COVID-19 HIT</string>
+    <string name="distance">Distance</string>
+    <string name="meter">M</string>
+    <string name="kilometer">KM</string>
+    <string name="get_a_walking_route">Get a Walking \n Route</string>
+    <string name="scroll_to_see_more">Please scroll to see the labs around you.</string>
+    <string name="start_navigation">Start Navigation</string>
+</resources>
