@@ -40,7 +40,7 @@ The project aims to how to use **HMS** in the real-life applications. Our use-ca
 
 We're going to use `Analytics` + `Map` + `Location` + `Site` Kits and `Directions` API to demonstrate theirs usage in this use-case. Application's architecture pattern is `MVVM` with modular project architecture. Currently, project have 3 modules which are `App`, `Base` and `Network` modules. Their usage and role differs as module. And lastly, it developed with everyone's favorite Kotlin Coroutine which is the language level supported feature.
 
-> ⚠ Please for inspection, install the APK in \resources folder. Installing Android Studio would cause you problems. The first problem would be the missing keystore (.jks) file. Even though, you create one. You need to create a project on AppGallery Connect and remake the initial setup process. That would take some time. That's why I suggest you install APK before getting into some labor.
+> ⚠ Please for inspection, install the APK in `resources` folder. Installing the sample app via Android Studio would cause you problems. The first problem would be the missing keystore (.jks) file. Even though, you create one. You need to create a project on AppGallery Connect and remake the initial setup process. That would take some time. That's why I suggest you install APK before getting into some labor.
 
 
 
