@@ -111,7 +111,12 @@ class HomeViewModel(
     fun drawCirclePivotalToCurrentLocation() {
         mapKitManager?.drawCircle(
             CircleOptions()
-                .center(LatLng(userLocation?.coordinate?.first!!, userLocation?.coordinate?.second!!))
+                .center(
+                    LatLng(
+                        userLocation?.coordinate?.first!!,
+                        userLocation?.coordinate?.second!!
+                    )
+                )
                 .radius(DEFAULT_KM_RADIUS.toDouble())
                 .fillColor(circleColor)
                 .strokeColor(Color.TRANSPARENT)
@@ -130,20 +135,26 @@ class HomeViewModel(
         )
     }
 
-    fun setOnMarkerClickListener(listener: (marker: Marker) -> Unit) = mapKitManager?.setOnMarkerClickListener {
-        analyticsManager?.sendEvent("MarkerSelected", Bundle().apply {
-            putString("Site", it.title)
-        })
+    fun setOnMarkerClickListener(listener: (marker: Marker) -> Unit) =
+        mapKitManager?.setOnMarkerClickListener {
+            analyticsManager?.sendEvent("MarkerSelected", Bundle().apply {
+                putString("Site", it.title)
+            })
 
-        Log.i(MTAG, "Selected ${it.title}")
-        listener(it)
-        enableSelectedMarker()
-    }
+            Log.i(MTAG, "Selected ${it.title}")
+            listener(it)
+            enableSelectedMarker()
+        }
 
     fun getRoute(`for`: RouteType, onFailed: ((errorMessage: String) -> Unit)? = null) {
-        val originCoordinates = Coordinates(userLocation?.coordinate?.first!!, userLocation?.coordinate?.second!!)
-        val destinationCoordinates = Coordinates(mapKitManager?.selectedMarker?.position!!.latitude, mapKitManager?.selectedMarker?.position!!.longitude)
-        val routeDirection = RouteDirection(origin = originCoordinates, destination = destinationCoordinates)
+        val originCoordinates =
+            Coordinates(userLocation?.coordinate?.first!!, userLocation?.coordinate?.second!!)
+        val destinationCoordinates = Coordinates(
+            mapKitManager?.selectedMarker?.position!!.latitude,
+            mapKitManager?.selectedMarker?.position!!.longitude
+        )
+        val routeDirection =
+            RouteDirection(origin = originCoordinates, destination = destinationCoordinates)
 
         viewModelScope.launch {
             var routeResponse: RouteResponse? = null
@@ -207,7 +218,7 @@ class HomeViewModel(
             locationCallback = object : LocationCallback() {
                 override fun onLocationResult(locationResult: LocationResult?) {
                     if (locationResult != null) {
-                        with (locationResult.lastHWLocation) {
+                        with(locationResult.lastHWLocation) {
 
                             if (!isNearbyHealthInstitutionsFetched.get()) {
                                 if (userLocation?.city == null &&
@@ -237,42 +248,8 @@ class HomeViewModel(
                                 }
                             }
 
-                            if (stepList != null) {
-                                Log.i(MTAG, "stepList is ${stepList!!.first().latitudeRange?.first}")
-
-                                run loop@ {
-                                    stepList?.forEach {
-
-                                        val inPolyline = latitude.toLong() in it.latitudeRange!! && longitude.toLong() in it.longitudeRange!!
-
-                                        if (inPolyline) {
-                                            Log.i(MTAG, "inPolyline is $inPolyline and ${it.instruction}")
-
-                                            //val v = GeomagneticField(latitude.toFloat(), longitude.toFloat(), altitude.toFloat(), System.currentTimeMillis())
-
-                                            val b = locationResult.lastLocation.bearingTo(Location("").apply {
-                                                latitude = it.endLocation.lat
-                                                longitude = it.endLocation.lng
-                                            })
-
-                                            currentNavigationInfo.value = it.instruction to "${it.distanceText} (${it.durationText})"
-
-                                            if (isStartNavigationTriggered) {
-                                                isStartNavigationTriggered = false
-                                                mapKitManager?.moveCamera(
-                                                    latLng = userLocation?.coordinate?.first!! to userLocation?.coordinate?.second!!,
-                                                    zoom = 19f,
-                                                    tilt = 20f,
-                                                    bearing = b * -1
-                                                )
-                                            }
-
-                                            return@loop
-                                        }
-                                    }
-                                }
-
-                            }
+                            if (stepList != null)
+                                rotateCameraToCurrentDirection(locationResult.lastLocation, stepList!!)
 
                             Log.i(MTAG, "onLocationResult() - Last location city is $city")
                             Log.i(MTAG, "onLocationResult() - Last location countryName is $countryName")
@@ -295,8 +272,49 @@ class HomeViewModel(
             circleColor = THEME_LIGHT_CIRCLE_COLOR
         } else {
             circleColor = THEME_DARK_CIRCLE_COLOR
-            mapKitManager?.mapStyleOptions = MapStyleOptions.loadRawResourceStyle(appContext, R.raw.map_style_dark)
+            mapKitManager?.mapStyleOptions =
+                MapStyleOptions.loadRawResourceStyle(appContext, R.raw.map_style_dark)
         }
+    }
+
+    private fun rotateCameraToCurrentDirection(lastLocation: Location?, stepList: List<Step>) {
+        Log.i(MTAG, "stepList is ${stepList.first().latitudeRange?.first}")
+
+        run loop@{
+            stepList.forEach {
+
+                val inPolyline =
+                    userLocation?.coordinate?.first?.toLong() in it.latitudeRange!! && userLocation?.coordinate?.second?.toLong() in it.longitudeRange!!
+
+                if (inPolyline) {
+                    Log.i(MTAG, "inPolyline is $inPolyline and ${it.instruction}")
+
+                    val b = lastLocation?.bearingTo(Location("").apply {
+                        latitude = it.endLocation.lat
+                        longitude = it.endLocation.lng
+                    })
+
+                    fillNavigationInfoText(step = it)
+
+                    if (isStartNavigationTriggered && b != null) {
+                        isStartNavigationTriggered = false
+                        mapKitManager?.moveCamera(
+                            latLng = userLocation?.coordinate?.first!! to userLocation?.coordinate?.second!!,
+                            zoom = 19f,
+                            tilt = 20f,
+                            bearing = b * -1
+                        )
+                    }
+
+                    return@loop
+                }
+            }
+        }
+    }
+
+    private fun fillNavigationInfoText(step: Step) {
+        currentNavigationInfo.value =
+            step.instruction to "${step.distanceText} (${step.durationText})"
     }
 
     private suspend fun getNearbyHealthInstitutions(radius: Meter = DEFAULT_KM_RADIUS): List<Site> {
@@ -329,17 +347,24 @@ class HomeViewModel(
         return result
     }
 
-    private fun findNearbyOfficialHealthInstitutions(officialHealthInstitutionList: List<Institution>, nearbyHealthInstitutions: List<Site>): List<Site> {
+    private fun findNearbyOfficialHealthInstitutions(
+        officialHealthInstitutionList: List<Institution>,
+        nearbyHealthInstitutions: List<Site>
+    ): List<Site> {
         val result = mutableListOf<Site>()
 
         officialHealthInstitutionList.forEach { institution ->
             nearbyHealthInstitutions.forEach { site ->
                 StringSimilarity.printSimilarity(institution.name, site.name.toUpperCase())
 
-                val similarity = StringSimilarity.similarity(institution.name, site.name.toUpperCase())
+                val similarity =
+                    StringSimilarity.similarity(institution.name, site.name.toUpperCase())
 
                 if (similarity > SIMILARITY_THRESHOLD) {
-                    Log.i(MTAG, "findNearbyOfficialHealthInstitutions() - ${institution.name} and ${site.name.toUpperCase()} have %$similarity")
+                    Log.i(
+                        MTAG,
+                        "findNearbyOfficialHealthInstitutions() - ${institution.name} and ${site.name.toUpperCase()} have %$similarity"
+                    )
                     result.add(site)
                 }
 
@@ -354,7 +379,10 @@ class HomeViewModel(
         return result
     }
 
-    private inline fun addAllNearbyLocations(radius: Float, crossinline onEnd: (nearbyHealthInstitutions: List<Site>) -> Unit) {
+    private inline fun addAllNearbyLocations(
+        radius: Float,
+        crossinline onEnd: (nearbyHealthInstitutions: List<Site>) -> Unit
+    ) {
         val nearbyHealthInstitutions = mutableListOf<Site>()
 
         var j = 0 // Delete this crappy solution when you find the good and robust one
@@ -362,7 +390,10 @@ class HomeViewModel(
             Log.i(TAG, "i is $i")
 
             siteKitManager?.searchNearby(
-                location = Coordinate(userLocation?.coordinate?.first!!, userLocation?.coordinate?.second!!),
+                location = Coordinate(
+                    userLocation?.coordinate?.first!!,
+                    userLocation?.coordinate?.second!!
+                ),
                 radius = radius,
                 searchLanguage = "tr",
                 locationType = LocationType.HOSPITAL,
@@ -378,7 +409,10 @@ class HomeViewModel(
                             return
 
                         for (site in sites) {
-                            Log.i("TAG", "siteId: ${site.siteId}, name: ${site.name}, distance: ${site.distance} address: ${site.address} \r\n")
+                            Log.i(
+                                "TAG",
+                                "siteId: ${site.siteId}, name: ${site.name}, distance: ${site.distance} address: ${site.address} \r\n"
+                            )
                         }
 
                         nearbyHealthInstitutions.addAll(sites)
