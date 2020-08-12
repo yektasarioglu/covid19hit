@@ -1,0 +1,145 @@
+{
+	"info": {
+		"_postman_id": "df40d416-3fa7-4991-b4c0-53bc364508aa",
+		"name": "Matrix API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Bicycling Route Plan",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"origins\": [\r\n        {\r\n            \"lng\": 2.359782,\r\n            \"lat\": 48.862544\r\n        },\r\n        {\r\n            \"lng\": 2.358537,\r\n            \"lat\": 48.861443\r\n        }\r\n    ],\r\n    \"destinations\": [\r\n        {\r\n            \"lng\": 2.361702,\r\n            \"lat\": 48.86042\r\n        }\r\n    ],\r\n    \"language\": \"en\"\r\n}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/bicyclingMatrix?key={{KEY}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"bicyclingMatrix"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "{{KEY}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Driving Route Plan",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"origins\": [\r\n        {\r\n            \"lng\": 2.359782,\r\n            \"lat\": 48.862544\r\n        },\r\n        {\r\n            \"lng\": 2.358537,\r\n            \"lat\": 48.861443\r\n        }\r\n    ],\r\n    \"destinations\": [\r\n        {\r\n            \"lng\": 2.361702,\r\n            \"lat\": 48.86042\r\n        }\r\n    ],\r\n    \"language\": \"en\"\r\n}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/drivingMatrix?key={{KEY}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"drivingMatrix"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "{{KEY}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Walking Route Plan",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"origins\": [\r\n        {\r\n            \"lng\": 2.359782,\r\n            \"lat\": 48.862544\r\n        },\r\n        {\r\n            \"lng\": 2.358537,\r\n            \"lat\": 48.861443\r\n        }\r\n    ],\r\n    \"destinations\": [\r\n        {\r\n            \"lng\": 2.361702,\r\n            \"lat\": 48.86042\r\n        }\r\n    ],\r\n    \"language\": \"en\"\r\n}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/walkingMatrix?key={{KEY}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"walkingMatrix"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "{{KEY}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "89b2f0b2-948d-414e-a3dd-0e3a495c04ad",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "79f105ce-dcc4-4eab-bcf9-b215fc129279",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "a9372aae-8429-4c72-8b8f-65d5afff7555",
+			"key": "BASE_URL",
+			"value": "https://mapapi.cloud.huawei.com/mapApi/v1/routeService",
+			"type": "string"
+		},
+		{
+			"id": "2bfbc8dc-6840-4b79-85b5-d464e75e8b20",
+			"key": "KEY",
+			"value": "CV8QBfi0NRylE0JOX4OMazAYZu5PBu7wzmUiHqLp1rpvx8Cch7WLjfjWRmGSBHL/eN4GjmX3JVihejqyOvBFDBWgXP/8",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

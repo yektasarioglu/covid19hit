@@ -1,0 +1,145 @@
+{
+	"info": {
+		"_postman_id": "1428b351-495b-4b32-98a9-5acd701fa96c",
+		"name": "Directions API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Bicycling Route Plan",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"origin\":{\r\n        \"lat\":41.025327712302214,\r\n        \"lng\":28.936323202795798\r\n        },\r\n    \"destination\":{\r\n        \"lat\":41.02035145,\r\n        \"lng\":28.93746141312949\r\n        }\r\n}\r\n"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/bicycling?key={{KEY}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"bicycling"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "{{KEY}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Driving Route Plan",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"origin\":{\r\n        \"lat\":41.025327712302214,\r\n        \"lng\":28.936323202795798\r\n        },\r\n    \"destination\":{\r\n        \"lat\":41.02035145,\r\n        \"lng\":28.93746141312949\r\n        }\r\n}\r\n"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/driving?key={{KEY}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"driving"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "{{KEY}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Walking Route Plan",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"origin\":{\r\n        \"lat\":41.025327712302214,\r\n        \"lng\":28.936323202795798\r\n        },\r\n    \"destination\":{\r\n        \"lat\":41.02035145,\r\n        \"lng\":28.93746141312949\r\n        }\r\n}\r\n"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/walking?key={{KEY}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"walking"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "{{KEY}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "127da270-5bf0-4cd4-adc1-f158a8ff2c83",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "08e3d05a-5b66-4754-8790-91c362c91a4a",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "6c2fe64b-d9ee-4dce-90d8-387f0b6eafa1",
+			"key": "BASE_URL",
+			"value": "https://mapapi.cloud.huawei.com/mapApi/v1/routeService",
+			"type": "string"
+		},
+		{
+			"id": "2b324ea4-cdc6-4c81-8b47-a11aa5af11e1",
+			"key": "KEY",
+			"value": "CV8QBfi0NRylE0JOX4OMazAYZu5PBu7wzmUiHqLp1rpvx8Cch7WLjfjWRmGSBHL/eN4GjmX3JVihejqyOvBFDBWgXP/8",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
