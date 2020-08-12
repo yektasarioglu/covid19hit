@@ -75,8 +75,6 @@ class HomeActivity : CustomBaseActivity() {
     override fun onStart() {
         mapView.onStart()
         super.onStart()
-
-        viewModel.requestLocationUpdates()
     }
 
     override fun onResume() {
