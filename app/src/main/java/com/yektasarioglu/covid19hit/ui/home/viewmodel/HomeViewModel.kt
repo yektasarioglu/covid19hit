@@ -38,10 +38,12 @@ import com.yektasarioglu.network.response.RouteResponse
 import com.yektasarioglu.network.response.Step
 import com.yektasarioglu.network.utils.appContext
 
-import kotlinx.coroutines.*
+import java.util.concurrent.atomic.AtomicBoolean
 
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+
+import kotlinx.coroutines.*
 
 typealias Meter = Float
 
@@ -67,6 +69,7 @@ class HomeViewModel(
     private var stepList: List<Step>? = null
 
     private var isStartNavigationTriggered: Boolean = false
+    private var isNearbyHealthInstitutionsFetched = AtomicBoolean(false)
 
     // This is our pattern -> Direction and Meter(Minute)
     var currentNavigationInfo: MutableLiveData<Pair<String, String>> = MutableLiveData()
@@ -87,97 +90,6 @@ class HomeViewModel(
     fun initialize(activity: Activity) {
         initializeManagers(activity)
         requestLocationUpdates()
-    }
-
-    fun requestLocationUpdates() {
-        locationKitManager?.requestLocationUpdatesWithCallback(
-            locationRequest = LocationRequest().apply {
-                interval = 10000L
-                priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-                needAddress = true // This let you to reach the current address information.
-            },
-            locationCallback = object : LocationCallback() {
-                override fun onLocationResult(locationResult: LocationResult?) {
-                    if (locationResult != null) {
-                        with (locationResult.lastHWLocation) {
-
-                            if (userLocation?.city == null &&
-                                userLocation?.country == null &&
-                                userLocation?.state == null &&
-                                userLocation?.coordinate == null
-                            ) {
-                                userLocation?.city = city
-                                userLocation?.country = countryName
-                                userLocation?.state = state
-                                userLocation?.coordinate = latitude to longitude
-
-                                isCoordinateAvailable.value = Unit
-
-                                viewModelScope.launch {
-                                    nearbyHealthInstitutionSites.value = withContext(context = Dispatchers.Default) {
-                                        var list = listOf<Site>()
-                                        while (list.isEmpty()) {
-                                            Log.i(MTAG, "list is empty")
-                                            list = getNearbyHealthInstitutions()
-                                        }
-                                        list
-                                    } as ArrayList<Site>
-
-                                    //nearbyHealthInstitutionSites.value = getNearbyHealthInstitutions() as ArrayList<Site>
-                                }
-                            }
-
-                            if (stepList != null) {
-                                Log.i(MTAG, "stepList is ${stepList!!.first().latitudeRange?.first}")
-
-                                run loop@ {
-                                    stepList?.forEach {
-
-                                        val inPolyline = latitude.toLong() in it.latitudeRange!! && longitude.toLong() in it.longitudeRange!!
-
-                                        if (inPolyline) {
-                                            Log.i(MTAG, "inPolyline is $inPolyline and ${it.instruction}")
-
-                                            //val v = GeomagneticField(latitude.toFloat(), longitude.toFloat(), altitude.toFloat(), System.currentTimeMillis())
-
-                                            val b = locationResult.lastLocation.bearingTo(Location("").apply {
-                                                latitude = it.endLocation.lat
-                                                longitude = it.endLocation.lng
-                                            })
-
-                                            currentNavigationInfo.value = it.instruction to "${it.distanceText} (${it.durationText})"
-
-                                            if (isStartNavigationTriggered) {
-                                                isStartNavigationTriggered = false
-                                                mapKitManager?.moveCamera(
-                                                    latLng = userLocation?.coordinate?.first!! to userLocation?.coordinate?.second!!,
-                                                    zoom = 19f,
-                                                    tilt = 20f,
-                                                    bearing = b * -1
-                                                )
-                                            }
-
-                                            return@loop
-                                        }
-                                    }
-                                }
-
-                            }
-
-                            Log.i(MTAG, "onLocationResult() - Last location city is $city")
-                            Log.i(MTAG, "onLocationResult() - Last location countryName is $countryName")
-                            Log.i(MTAG, "onLocationResult() - Last location county is $county")
-                            Log.i(MTAG, "onLocationResult() - Last location accuracy is $accuracy")
-                            Log.i(MTAG, "onLocationResult() - Last location phone is $phone")
-                            Log.i(MTAG, "onLocationResult() - Last location postalCode is $postalCode")
-                            Log.i(MTAG, "onLocationResult() - Last location state is $state")
-                            Log.i(MTAG, "onLocationResult() - Last location street is $street")
-                            Log.i(MTAG, "onLocationResult() - Latitude is $latitude")
-                            Log.i(MTAG, "onLocationResult() - Longitude is $longitude")
-                        }
-                    } else Log.i(MTAG, "locationResult is NULL !!")
-                }
-            })
     }
 
     fun getOnMapReadyCallback(): OnMapReadyCallback = mapKitManager as OnMapReadyCallback
@@ -283,6 +195,99 @@ class HomeViewModel(
         analyticsManager?.sendEvent("XX", Bundle().apply {
             putString("TestProperty1", "TestValue1")
         })
+    }
+
+    private fun requestLocationUpdates() {
+        locationKitManager?.requestLocationUpdatesWithCallback(
+            locationRequest = LocationRequest().apply {
+                interval = 10000L
+                priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+                needAddress = true // This let you to reach the current address information.
+            },
+            locationCallback = object : LocationCallback() {
+                override fun onLocationResult(locationResult: LocationResult?) {
+                    if (locationResult != null) {
+                        with (locationResult.lastHWLocation) {
+
+                            if (!isNearbyHealthInstitutionsFetched.get()) {
+                                if (userLocation?.city == null &&
+                                    userLocation?.country == null &&
+                                    userLocation?.state == null &&
+                                    userLocation?.coordinate == null
+                                ) {
+                                    userLocation?.city = city
+                                    userLocation?.country = countryName
+                                    userLocation?.state = state
+                                    userLocation?.coordinate = latitude to longitude
+
+                                    isCoordinateAvailable.value = Unit
+
+                                    viewModelScope.launch {
+                                        nearbyHealthInstitutionSites.value =
+                                            withContext(context = Dispatchers.Default) {
+                                                var list = listOf<Site>()
+                                                while (list.isEmpty()) {
+                                                    Log.i(MTAG, "list is empty")
+                                                    list = getNearbyHealthInstitutions()
+                                                }
+                                                isNearbyHealthInstitutionsFetched.set(true)
+                                                list
+                                            } as ArrayList<Site>
+                                    }
+                                }
+                            }
+
+                            if (stepList != null) {
+                                Log.i(MTAG, "stepList is ${stepList!!.first().latitudeRange?.first}")
+
+                                run loop@ {
+                                    stepList?.forEach {
+
+                                        val inPolyline = latitude.toLong() in it.latitudeRange!! && longitude.toLong() in it.longitudeRange!!
+
+                                        if (inPolyline) {
+                                            Log.i(MTAG, "inPolyline is $inPolyline and ${it.instruction}")
+
+                                            //val v = GeomagneticField(latitude.toFloat(), longitude.toFloat(), altitude.toFloat(), System.currentTimeMillis())
+
+                                            val b = locationResult.lastLocation.bearingTo(Location("").apply {
+                                                latitude = it.endLocation.lat
+                                                longitude = it.endLocation.lng
+                                            })
+
+                                            currentNavigationInfo.value = it.instruction to "${it.distanceText} (${it.durationText})"
+
+                                            if (isStartNavigationTriggered) {
+                                                isStartNavigationTriggered = false
+                                                mapKitManager?.moveCamera(
+                                                    latLng = userLocation?.coordinate?.first!! to userLocation?.coordinate?.second!!,
+                                                    zoom = 19f,
+                                                    tilt = 20f,
+                                                    bearing = b * -1
+                                                )
+                                            }
+
+                                            return@loop
+                                        }
+                                    }
+                                }
+
+                            }
+
+                            Log.i(MTAG, "onLocationResult() - Last location city is $city")
+                            Log.i(MTAG, "onLocationResult() - Last location countryName is $countryName")
+                            Log.i(MTAG, "onLocationResult() - Last location county is $county")
+                            Log.i(MTAG, "onLocationResult() - Last location accuracy is $accuracy")
+                            Log.i(MTAG, "onLocationResult() - Last location phone is $phone")
+                            Log.i(MTAG, "onLocationResult() - Last location postalCode is $postalCode")
+                            Log.i(MTAG, "onLocationResult() - Last location state is $state")
+                            Log.i(MTAG, "onLocationResult() - Last location street is $street")
+                            Log.i(MTAG, "onLocationResult() - Latitude is $latitude")
+                            Log.i(MTAG, "onLocationResult() - Longitude is $longitude")
+                        }
+                    } else Log.i(MTAG, "locationResult is NULL !!")
+                }
+            })
     }
 
     fun initializeStyle(theme: Theme?) {
