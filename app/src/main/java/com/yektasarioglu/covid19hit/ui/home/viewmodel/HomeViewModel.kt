@@ -249,14 +249,23 @@ class HomeViewModel(
                             }
 
                             if (stepList != null)
-                                rotateCameraToCurrentDirection(locationResult.lastLocation, stepList!!)
+                                rotateCameraToCurrentDirection(
+                                    locationResult.lastLocation,
+                                    stepList!!
+                                )
 
                             Log.i(MTAG, "onLocationResult() - Last location city is $city")
-                            Log.i(MTAG, "onLocationResult() - Last location countryName is $countryName")
+                            Log.i(
+                                MTAG,
+                                "onLocationResult() - Last location countryName is $countryName"
+                            )
                             Log.i(MTAG, "onLocationResult() - Last location county is $county")
                             Log.i(MTAG, "onLocationResult() - Last location accuracy is $accuracy")
                             Log.i(MTAG, "onLocationResult() - Last location phone is $phone")
-                            Log.i(MTAG, "onLocationResult() - Last location postalCode is $postalCode")
+                            Log.i(
+                                MTAG,
+                                "onLocationResult() - Last location postalCode is $postalCode"
+                            )
                             Log.i(MTAG, "onLocationResult() - Last location state is $state")
                             Log.i(MTAG, "onLocationResult() - Last location street is $street")
                             Log.i(MTAG, "onLocationResult() - Latitude is $latitude")
@@ -383,51 +392,53 @@ class HomeViewModel(
         radius: Float,
         crossinline onEnd: (nearbyHealthInstitutions: List<Site>) -> Unit
     ) {
+        if (siteKitManager == null) return
+
         val nearbyHealthInstitutions = mutableListOf<Site>()
 
-        var j = 0 // Delete this crappy solution when you find the good and robust one
         for (i in 1..SiteKitManager.MAX_PAGE_INDEX) {
             Log.i(TAG, "i is $i")
 
-            siteKitManager?.searchNearby(
-                location = Coordinate(
-                    userLocation?.coordinate?.first!!,
-                    userLocation?.coordinate?.second!!
-                ),
-                radius = radius,
-                searchLanguage = "tr",
-                locationType = LocationType.HOSPITAL,
-                pageFilters = i to 20,
-                searchResultListener = object : SearchResultListener<NearbySearchResponse?> {
+            if (siteKitManager!!.isInTheRangeOfMaxResult(pageIndex = i, pageSize = 20))
+                siteKitManager?.searchNearby(
+                    location = Coordinate(
+                        userLocation?.coordinate?.first!!,
+                        userLocation?.coordinate?.second!!
+                    ),
+                    radius = radius,
+                    searchLanguage = "en",
+                    locationType = LocationType.HOSPITAL,
+                    pageFilters = i to 20,
+                    searchResultListener = object : SearchResultListener<NearbySearchResponse?> {
 
-                    // Return search results upon a successful search.
-                    override fun onSearchResult(results: NearbySearchResponse?) {
-                        Log.i("TAG", "Total result count is ${results?.totalCount}")
+                        // Return search results upon a successful search.
+                        override fun onSearchResult(results: NearbySearchResponse?) {
+                            Log.i("TAG", "Total result count is ${results?.totalCount}")
 
-                        val sites = results!!.sites
-                        if (results.totalCount <= 0 || sites == null || sites.size <= 0)
-                            return
+                            val sites = results!!.sites
+                            if (results.totalCount <= 0 || sites == null || sites.size <= 0)
+                                return
 
-                        for (site in sites) {
-                            Log.i(
-                                "TAG",
-                                "siteId: ${site.siteId}, name: ${site.name}, distance: ${site.distance} address: ${site.address} \r\n"
-                            )
+                            for (site in sites) {
+                                Log.i(
+                                    "TAG",
+                                    "siteId: ${site.siteId}, name: ${site.name}, distance: ${site.distance} address: ${site.address} \r\n"
+                                )
+                            }
+
+                            nearbyHealthInstitutions.addAll(sites)
+
+                            Log.i(MTAG + "CALLBACK", "i is $i")
+
+                            if (nearbyHealthInstitutions.size == SiteKitManager.MAX_RESULT)
+                                onEnd(nearbyHealthInstitutions)
                         }
 
-                        nearbyHealthInstitutions.addAll(sites)
-
-                        Log.i(MTAG + "CALLBACK", "i is $i")
-                        j++
-                        if (j == 3)
-                            onEnd(nearbyHealthInstitutions)
+                        override fun onSearchError(status: SearchStatus) {
+                            Log.i("TAG", "Error : " + status.errorCode + " " + status.errorMessage)
+                        }
                     }
-
-                    override fun onSearchError(status: SearchStatus) {
-                        Log.i("TAG", "Error : " + status.errorCode + " " + status.errorMessage)
-                    }
-                }
-            )
+                )
         }
     }
 

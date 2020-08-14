@@ -86,9 +86,19 @@ class SiteKitManager(activity: Activity, apiKey: String) : IManager {
         searchService!!.nearbySearch(request, searchResultListener)
     }
 
+    /**
+     * It applies the formula with the given parameters and decide if the result
+     * in the range of max result quota which is 60
+     * @param pageIndex could be between 1 to 60
+     * @param pageSize could be between 1 to 20
+     * @see <a href="https://developer.huawei.com/consumer/en/doc/development/HMSCore-Guides/android-sdk-nearby-place--search-0000001050158585#EN-US_TOPIC_0000001050158585__section1135942942514">Reference</a>
+     */
+    fun isInTheRangeOfMaxResult(pageIndex: Int, pageSize: Int = MAX_PAGE_SIZE) = pageIndex * pageSize <= MAX_RESULT
+
     companion object {
         const val MAX_PAGE_SIZE = 20
         const val MAX_PAGE_INDEX = 60
+        const val MAX_RESULT = 60
     }
 
 }
