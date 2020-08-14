@@ -249,23 +249,14 @@ class HomeViewModel(
                             }
 
                             if (stepList != null)
-                                rotateCameraToCurrentDirection(
-                                    locationResult.lastLocation,
-                                    stepList!!
-                                )
+                                rotateCameraToCurrentDirection(locationResult.lastLocation, stepList!!)
 
                             Log.i(MTAG, "onLocationResult() - Last location city is $city")
-                            Log.i(
-                                MTAG,
-                                "onLocationResult() - Last location countryName is $countryName"
-                            )
+                            Log.i(MTAG, "onLocationResult() - Last location countryName is $countryName")
                             Log.i(MTAG, "onLocationResult() - Last location county is $county")
                             Log.i(MTAG, "onLocationResult() - Last location accuracy is $accuracy")
                             Log.i(MTAG, "onLocationResult() - Last location phone is $phone")
-                            Log.i(
-                                MTAG,
-                                "onLocationResult() - Last location postalCode is $postalCode"
-                            )
+                            Log.i(MTAG, "onLocationResult() - Last location postalCode is $postalCode")
                             Log.i(MTAG, "onLocationResult() - Last location state is $state")
                             Log.i(MTAG, "onLocationResult() - Last location street is $street")
                             Log.i(MTAG, "onLocationResult() - Latitude is $latitude")
@@ -334,7 +325,7 @@ class HomeViewModel(
             Log.i(MTAG, "nearby list's size is ${filteredList?.size}")
 
             val result = suspendCoroutine<List<Site>> { continuation ->
-                addAllNearbyLocations(
+                addNearbyHospitals(
                     radius = radius,
                     onEnd = { nearbyHealthInstitutions ->
                         findNearbyOfficialHealthInstitutions(
@@ -388,7 +379,7 @@ class HomeViewModel(
         return result
     }
 
-    private inline fun addAllNearbyLocations(
+    private inline fun addNearbyHospitals(
         radius: Float,
         crossinline onEnd: (nearbyHealthInstitutions: List<Site>) -> Unit
     ) {
@@ -420,10 +411,7 @@ class HomeViewModel(
                                 return
 
                             for (site in sites) {
-                                Log.i(
-                                    "TAG",
-                                    "siteId: ${site.siteId}, name: ${site.name}, distance: ${site.distance} address: ${site.address} \r\n"
-                                )
+                                Log.i("TAG", "siteId: ${site.siteId}, name: ${site.name}, distance: ${site.distance} address: ${site.address} \r\n")
                             }
 
                             nearbyHealthInstitutions.addAll(sites)
