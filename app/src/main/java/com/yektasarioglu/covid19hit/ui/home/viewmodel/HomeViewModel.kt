@@ -328,8 +328,8 @@ class HomeViewModel(
                 addNearbyHospitals(
                     radius = radius,
                     onEnd = { nearbyHealthInstitutions ->
-                        findNearbyOfficialHealthInstitutions(
-                            officialHealthInstitutionList = filteredList!!,
+                        compareHealthInstitutionLists(
+                            officialHealthInstitutions = filteredList!!,
                             nearbyHealthInstitutions = nearbyHealthInstitutions
                         ).let { found -> continuation.resume(found) }
                     })
@@ -347,13 +347,13 @@ class HomeViewModel(
         return result
     }
 
-    private fun findNearbyOfficialHealthInstitutions(
-        officialHealthInstitutionList: List<Institution>,
+    private fun compareHealthInstitutionLists(
+        officialHealthInstitutions: List<Institution>,
         nearbyHealthInstitutions: List<Site>
     ): List<Site> {
         val result = mutableListOf<Site>()
 
-        officialHealthInstitutionList.forEach { institution ->
+        officialHealthInstitutions.forEach { institution ->
             nearbyHealthInstitutions.forEach { site ->
                 StringSimilarity.printSimilarity(institution.name, site.name.toUpperCase())
 
