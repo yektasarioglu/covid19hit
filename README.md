@@ -56,3 +56,6 @@ Application has couple of features such as;
 - [x]  Sends user events or properties via Analytics Kit
 - [x]  Gets directions based on the options that you select which are by walk, by a drive, and by bike options via Directions API
 - [x]  Starts navigation view based on direction data
+
+## Guide
+[Create a Beautiful Site Tracker App with Huawei Mobile Services (HMS)](https://medium.com/huawei-developers/creating-site-tracker-app-with-huawei-mobile-services-hms-765a6c0ca61e)
